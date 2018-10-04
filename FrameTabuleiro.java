@@ -13,31 +13,31 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 	static final long serialVersionUID = 1L;
 
 	// imagens das pecas pretas
-	Image peaoPreto = new ImageIcon("src/imagens/pecas/pretas/peao.png", "")
+	Image peaoPreto = new ImageIcon("imagens/pecas/pretas/peao.png", "")
 			.getImage().getScaledInstance(30, 45, java.awt.Image.SCALE_SMOOTH);
-	Image torrePreta = new ImageIcon("src/imagens/pecas/pretas/torre.png", "")
+	Image torrePreta = new ImageIcon("imagens/pecas/pretas/torre.png", "")
 			.getImage().getScaledInstance(45, 50, java.awt.Image.SCALE_SMOOTH);
-	Image cavaloPreto = new ImageIcon("src/imagens/pecas/pretas/cavalo.png", "")
+	Image cavaloPreto = new ImageIcon("imagens/pecas/pretas/cavalo.png", "")
 			.getImage().getScaledInstance(40, 55, java.awt.Image.SCALE_SMOOTH);
-	Image bispoPreto = new ImageIcon("src/imagens/pecas/pretas/bispo.png", "")
+	Image bispoPreto = new ImageIcon("imagens/pecas/pretas/bispo.png", "")
 			.getImage().getScaledInstance(40, 58, java.awt.Image.SCALE_SMOOTH);
-	Image rainhaPreta = new ImageIcon("src/imagens/pecas/pretas/rainha.png", "")
+	Image rainhaPreta = new ImageIcon("imagens/pecas/pretas/rainha.png", "")
 			.getImage().getScaledInstance(35, 50, java.awt.Image.SCALE_SMOOTH);
-	Image reiPreto = new ImageIcon("src/imagens/pecas/pretas/rei.png", "")
+	Image reiPreto = new ImageIcon("imagens/pecas/pretas/rei.png", "")
 			.getImage().getScaledInstance(40, 60, java.awt.Image.SCALE_SMOOTH);
 
 	// imagens das pecas brancas
-	Image peaoBranco = new ImageIcon("src/imagens/pecas/brancas/peao.png", "")
+	Image peaoBranco = new ImageIcon("imagens/pecas/brancas/peao.png", "")
 			.getImage().getScaledInstance(30, 45, java.awt.Image.SCALE_SMOOTH);
-	Image torreBranca = new ImageIcon("src/imagens/pecas/brancas/torre.png", "")
+	Image torreBranca = new ImageIcon("imagens/pecas/brancas/torre.png", "")
 			.getImage().getScaledInstance(45, 50, java.awt.Image.SCALE_SMOOTH);
-	Image cavaloBranco = new ImageIcon("src/imagens/pecas/brancas/cavalo.png", "")
+	Image cavaloBranco = new ImageIcon("imagens/pecas/brancas/cavalo.png", "")
 			.getImage().getScaledInstance(40, 55, java.awt.Image.SCALE_SMOOTH);
-	Image bispoBranco = new ImageIcon("src/imagens/pecas/brancas/bispo.png", "")
+	Image bispoBranco = new ImageIcon("imagens/pecas/brancas/bispo.png", "")
 			.getImage().getScaledInstance(40, 58, java.awt.Image.SCALE_SMOOTH);
-	Image rainhaBranca = new ImageIcon("src/imagens/pecas/brancas/rainha.png", "")
+	Image rainhaBranca = new ImageIcon("imagens/pecas/brancas/rainha.png", "")
 			.getImage().getScaledInstance(35, 50, java.awt.Image.SCALE_SMOOTH);
-	Image reiBranco = new ImageIcon("src/imagens/pecas/brancas/rei.png", "")
+	Image reiBranco = new ImageIcon("imagens/pecas/brancas/rei.png", "")
 			.getImage().getScaledInstance(40, 60, java.awt.Image.SCALE_SMOOTH);
 
 	GridLayout gerenciadorDeLayout = new GridLayout(8, 8);
