@@ -44,12 +44,12 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 
 	private GridLayout gerenciadorDeLayout = new GridLayout(8, 8);
 
-	private static final String TEXTO_BARRA_SUPERIOR = "Vinicius Shoiti - EP3";
+	private static final String TEXTO_BARRA_SUPERIOR = "Xadrez - EP redes";
 	public Tabuleiro tabuleiro ;
-	private ObjectOutputStream out;
+	public Client cliente;
 	
-	FrameTabuleiro(String jogador, ObjectOutputStream out) {
-		this.out = out;
+	FrameTabuleiro(String jogador, Client client) {
+		this.cliente = client;
 		super.setTitle(TEXTO_BARRA_SUPERIOR);
 		super.setResizable(false);
 		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,7 +72,7 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 	}
 
 	void montaTabuleiro(String jogador) {
-		tabuleiro =  Tabuleiro.criaTabuleiro(jogador,out);
+		tabuleiro =  Tabuleiro.criaTabuleiro(jogador,this);
 		tabuleiro.criaEPintaAsCasas();
 		JPanel painelTabuleiro = new JPanel();
 		painelTabuleiro.setLayout(gerenciadorDeLayout);

@@ -1,11 +1,14 @@
+import java.awt.*;
 import java.io.Serializable;
 
 public class Movimento implements Serializable {
 
-    private int linha;
-    private int coluna;
-    private int linhaAntiga;
-    private int colunaAntiga;
+    public int linha;
+    public int coluna;
+    public int linhaAntiga;
+    public int colunaAntiga;
+    public String cor;
+    public Color corCasa;
 
     public Movimento(int linha, int coluna, int linhaAntiga, int colunaAntiga){
         this.linha = linha;
@@ -14,19 +17,5 @@ public class Movimento implements Serializable {
         this.colunaAntiga = colunaAntiga;
     }
 
-    public int getColuna() {
-        return coluna;
-    }
 
-    public int getLinha() {
-        return linha;
-    }
-
-    public int getLinhaAntiga() {
-        return linhaAntiga;
-    }
-
-    public int getColunaAntiga() {
-        return colunaAntiga;
-    }
 }

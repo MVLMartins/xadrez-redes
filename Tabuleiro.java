@@ -17,7 +17,7 @@ class Tabuleiro {
 	public String jogador;
 	public boolean ehSuaVez;
 
-	ObjectOutputStream out ;
+	private FrameTabuleiro out ;
 
 
 	private static Casa[][] tabuleiro = new Casa[8][8];
@@ -40,11 +40,11 @@ class Tabuleiro {
 	public final Color peaoPromocao = new Color(232, 63, 111);
 	public final Color reiRoque = new Color(232, 63, 111);
 
-	private Tabuleiro(ObjectOutputStream out) {
+	private Tabuleiro(FrameTabuleiro out) {
 		this.out = out;
 	}
 
-	public static Tabuleiro criaTabuleiro(String jogador,ObjectOutputStream out){
+	public static Tabuleiro criaTabuleiro(String jogador,FrameTabuleiro out){
 		if(instance==null){
 			instance = new Tabuleiro(out);
 			instance.jogador = jogador;
@@ -279,7 +279,6 @@ class Tabuleiro {
 
 
 	void trataCliqueSobreUmaCasa(int linha, int coluna) throws IOException {
-		System.out.println(ehSuaVez());
 		if(!ehSuaVez()){
 			JOptionPane.showMessageDialog(null, "Não é a sua vez.");
 		}else{
@@ -303,9 +302,9 @@ class Tabuleiro {
 					JOptionPane.showMessageDialog(null, "Essa jogada deixará o Rei em Cheque.");
 				}else{
 					Peca x = (Peca) pecaClicada;
-					Movimento m = new Movimento(linha,coluna,x.getCasa().getLinha(),x.getCasa().getColuna());
 					try{
-						out.writeObject(m);
+						out.cliente.enviaMovimento(linha,coluna,x.getCasa().getLinha(),x.getCasa().getColuna(),
+                                obtemCasa(linha, coluna).getBotao().getBackground());
 					}catch (IOException e){
 						System.out.print("xx");
 						e.printStackTrace();
@@ -320,22 +319,23 @@ class Tabuleiro {
 
 	}
 
-	public void  movePecas(int linha, int coluna,int linhaAntiga, int colunaAntiga ){
+	public void  movePecas(int linha, int coluna,int linhaAntiga, int colunaAntiga,Color cor ){
 
+		System.out.println(jogador + "a");
 		PecaDeXadrez pecaClicada = (PecaDeXadrez) obtemCasa(linhaAntiga,colunaAntiga).getPeca();
-		if (obtemBotaoCasa(linha, coluna).getBackground() == movimentoNormal) {
+		System.out.println(pecaClicada instanceof Peao);
+
+        System.out.println(cor);
+		if(movimentoNormal.equals(cor)) {
 			movePeca(pecaClicada, linha, coluna);
-		}
-
-		else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoMovDuasCasas) {
-			peaoMoveDuasCasas(pecaClicada, linha, coluna);
-		}
-
-		else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoEnPassant) {
+		}else if(peaoMovDuasCasas.equals(cor)){
+		    System.out.println("x");
+		    peaoMoveDuasCasas(pecaClicada, linha, coluna);
+        }else if (peaoEnPassant.equals(cor)) {
 			peaoEnPassant(pecaClicada, linha, coluna);
 		}
 
-		else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoPromocao) {
+		else if (peaoPromocao.equals(cor)) {
 			String[] pecas = { "Rainha", "Cavalo", "Torre", "Bispo" };
 			String pecaEscolhida = (String) JOptionPane.showInputDialog(null, "Escolha a peça desejada:",
 					"Promoção", JOptionPane.PLAIN_MESSAGE, null, pecas, pecas[0]);
@@ -377,10 +377,11 @@ class Tabuleiro {
 				pecasBrancas.add((PecaDeXadrez) obtemCasa(linha, coluna).getPeca());
 			}
 		}
-		else if (obtemBotaoCasa(linha, coluna).getBackground() == reiRoque) {
+		else if (reiRoque.equals(cor)) {
 				reiRoque(pecaClicada, linha, coluna);
 		}
 
+		ehSuaVez= !ehSuaVez;
 		pintaAsCasas();
 
 	}

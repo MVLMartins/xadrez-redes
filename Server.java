@@ -42,7 +42,9 @@ public class Server {
 
                 ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(client.getInputStream());
-                out.writeObject("branca");
+                Movimento m = new Movimento(1,1,1,1);
+                m.cor = "branca";
+                out.writeObject(m);
                 this.clients.add(out);
 
                 // create a new thread for client handling
@@ -52,7 +54,9 @@ public class Server {
 
                 ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(client.getInputStream());
-                out.writeObject("preta");
+                Movimento m = new Movimento(1,1,1,1);
+                m.cor = "preta";
+                out.writeObject(m);
 
                 this.clients.add(out);
 
@@ -63,7 +67,7 @@ public class Server {
         }
     }
 
-    void broadcastMessages(Object response) throws IOException {
+    void broadcastMessages(Movimento response) throws IOException {
         for (ObjectOutputStream client : this.clients) {
             client.writeObject(response);
         }
@@ -87,16 +91,20 @@ class ClientHandler implements Runnable {
     public void run() {
         String message;
 
+        boolean primeira = false;
+
         // when there is a new message, broadcast to all
         while (true){
             try {
-                Object obj = in.readObject();
-                System.out.println("d");
+                //Movimento obj = new Movimento(2,2,2,2);
+                Movimento obj = (Movimento) in.readObject();
+                System.out.println("olhaaaaa\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 server.broadcastMessages(obj);
             } catch (IOException e) {
-                //System.out.println("d");
+                System.out.println("1");
+                //primeira = !primeira;
             } catch (ClassNotFoundException e) {
-                System.out.print("c");
+                e.printStackTrace();
             }
 
 

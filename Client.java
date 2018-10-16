@@ -1,5 +1,7 @@
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
+import java.lang.management.MonitorInfo;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -9,6 +11,7 @@ public class Client {
     private int port;
     private String nickname;
     public FrameTabuleiro frame;
+    ObjectOutputStream out;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         new Client("localhost", 12345).run();
@@ -22,6 +25,7 @@ public class Client {
     public void run() throws IOException, ClassNotFoundException {
         // connect client to server
         Socket client = new Socket(host, port);
+        Scanner sc = new Scanner(System.in);
         System.out.println("Client successfully connected to server!");
 
         //set inputs e outputs do server
@@ -30,23 +34,25 @@ public class Client {
 
 
         //stream de objetos
-        ObjectOutputStream out = new ObjectOutputStream(outputStrem);
+        out = new ObjectOutputStream(outputStrem);
         ObjectInputStream in = new ObjectInputStream(inputStream);
 
+        Movimento m = (Movimento) in.readObject();
+
+
+
         //retorna qual jogador é
-        String tipo = (String) in.readObject();
+        //String tipo = (String) in.readObject();
+
+
 
         // create a new thread for server messages handling
         new Thread(new ReceivedMessagesHandler(inputStream,this,in)).start();
 
 
         // ask for a nickname
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter a nickname: ");
-        nickname = sc.nextLine();
 
-        // read messages from keyboard and send to server
-        System.out.println("Send messages: ");
+
 
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
@@ -61,12 +67,18 @@ public class Client {
         }
 
 
-        frame = new FrameTabuleiro(tipo,out);
+        frame = new FrameTabuleiro(m.cor,this);
 
 
         System.out.println("teste3");
-        sc.close();
-        client.close();
+        //sc.close();
+        //client.close();
+    }
+
+    public void  enviaMovimento(int linha, int coluna, int linhaAntiga, int colunaAntiga, Color cor) throws IOException {
+        Movimento a = new Movimento(linha, coluna, linhaAntiga, colunaAntiga);
+        a.corCasa = cor;
+        out.writeObject(a);
     }
 
     public void recebiMovimento(){
@@ -96,7 +108,8 @@ class ReceivedMessagesHandler implements Runnable {
         while (true){
             try {
                 Movimento response = (Movimento) in.readObject();
-                client.frame.tabuleiro.movePecas(response.getLinha(),response.getColuna(),response.getLinhaAntiga(),response.getColunaAntiga());
+                System.out.println(response.coluna);
+                client.frame.tabuleiro.movePecas(response.linha,response.coluna,response.linhaAntiga,response.colunaAntiga,response.corCasa);
 
             } catch (IOException e) {
             } catch (ClassNotFoundException e) {
