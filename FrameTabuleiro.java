@@ -2,6 +2,8 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -13,45 +15,48 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 	static final long serialVersionUID = 1L;
 
 	// imagens das pecas pretas
-	Image peaoPreto = new ImageIcon("imagens/pecas/pretas/peao.png", "")
+	private Image peaoPreto = new ImageIcon("imagens/pecas/pretas/peao.png", "")
 			.getImage().getScaledInstance(30, 45, java.awt.Image.SCALE_SMOOTH);
-	Image torrePreta = new ImageIcon("imagens/pecas/pretas/torre.png", "")
+	private Image torrePreta = new ImageIcon("imagens/pecas/pretas/torre.png", "")
 			.getImage().getScaledInstance(45, 50, java.awt.Image.SCALE_SMOOTH);
-	Image cavaloPreto = new ImageIcon("imagens/pecas/pretas/cavalo.png", "")
+	private Image cavaloPreto = new ImageIcon("imagens/pecas/pretas/cavalo.png", "")
 			.getImage().getScaledInstance(40, 55, java.awt.Image.SCALE_SMOOTH);
-	Image bispoPreto = new ImageIcon("imagens/pecas/pretas/bispo.png", "")
+	private Image bispoPreto = new ImageIcon("imagens/pecas/pretas/bispo.png", "")
 			.getImage().getScaledInstance(40, 58, java.awt.Image.SCALE_SMOOTH);
-	Image rainhaPreta = new ImageIcon("imagens/pecas/pretas/rainha.png", "")
+	private Image rainhaPreta = new ImageIcon("imagens/pecas/pretas/rainha.png", "")
 			.getImage().getScaledInstance(35, 50, java.awt.Image.SCALE_SMOOTH);
-	Image reiPreto = new ImageIcon("imagens/pecas/pretas/rei.png", "")
+	private Image reiPreto = new ImageIcon("imagens/pecas/pretas/rei.png", "")
 			.getImage().getScaledInstance(40, 60, java.awt.Image.SCALE_SMOOTH);
 
 	// imagens das pecas brancas
-	Image peaoBranco = new ImageIcon("imagens/pecas/brancas/peao.png", "")
+	private Image peaoBranco = new ImageIcon("imagens/pecas/brancas/peao.png", "")
 			.getImage().getScaledInstance(30, 45, java.awt.Image.SCALE_SMOOTH);
-	Image torreBranca = new ImageIcon("imagens/pecas/brancas/torre.png", "")
+	private Image torreBranca = new ImageIcon("imagens/pecas/brancas/torre.png", "")
 			.getImage().getScaledInstance(45, 50, java.awt.Image.SCALE_SMOOTH);
-	Image cavaloBranco = new ImageIcon("imagens/pecas/brancas/cavalo.png", "")
+	private Image cavaloBranco = new ImageIcon("imagens/pecas/brancas/cavalo.png", "")
 			.getImage().getScaledInstance(40, 55, java.awt.Image.SCALE_SMOOTH);
-	Image bispoBranco = new ImageIcon("imagens/pecas/brancas/bispo.png", "")
+	private Image bispoBranco = new ImageIcon("imagens/pecas/brancas/bispo.png", "")
 			.getImage().getScaledInstance(40, 58, java.awt.Image.SCALE_SMOOTH);
-	Image rainhaBranca = new ImageIcon("imagens/pecas/brancas/rainha.png", "")
+	private Image rainhaBranca = new ImageIcon("imagens/pecas/brancas/rainha.png", "")
 			.getImage().getScaledInstance(35, 50, java.awt.Image.SCALE_SMOOTH);
-	Image reiBranco = new ImageIcon("imagens/pecas/brancas/rei.png", "")
+	private Image reiBranco = new ImageIcon("imagens/pecas/brancas/rei.png", "")
 			.getImage().getScaledInstance(40, 60, java.awt.Image.SCALE_SMOOTH);
 
-	GridLayout gerenciadorDeLayout = new GridLayout(8, 8);
+	private GridLayout gerenciadorDeLayout = new GridLayout(8, 8);
+
+	private static final String TEXTO_BARRA_SUPERIOR = "Vinicius Shoiti - EP3";
+	public Tabuleiro tabuleiro ;
+	private ObjectOutputStream out;
 	
-	static final String TEXTO_BARRA_SUPERIOR = "Vinicius Shoiti - EP3";
-	Tabuleiro tabuleiro = Tabuleiro.getTabuleiro();
-	
-	FrameTabuleiro() {
+	FrameTabuleiro(String jogador, ObjectOutputStream out) {
+		this.out = out;
 		super.setTitle(TEXTO_BARRA_SUPERIOR);
 		super.setResizable(false);
 		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.montaTabuleiro();
+		this.montaTabuleiro(jogador);
 		super.pack();
 		super.setVisible(true);
+
 	}
 
 	@Override
@@ -59,10 +64,15 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 		String[] coordenada = e.getActionCommand().split(",");
 		int linha = Integer.parseInt(coordenada[0]);
 		int coluna = Integer.parseInt(coordenada[1]);
-		tabuleiro.trataCliqueSobreUmaCasa(linha,coluna);
+		try {
+			tabuleiro.trataCliqueSobreUmaCasa(linha,coluna);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 
-	void montaTabuleiro() {
+	void montaTabuleiro(String jogador) {
+		tabuleiro =  Tabuleiro.criaTabuleiro(jogador,out);
 		tabuleiro.criaEPintaAsCasas();
 		JPanel painelTabuleiro = new JPanel();
 		painelTabuleiro.setLayout(gerenciadorDeLayout);
@@ -106,16 +116,16 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 
 		super.getContentPane().add(painelTabuleiro);
 	}
-
+	/*
 	public static void main(String[] args) throws Exception {
 		//UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-		FrameTabuleiro frame = new FrameTabuleiro();
+		FrameTabuleiro frame = new FrameTabuleiro("verde");
 		
 		// para mover a peca: 
 		//     - copia a peca para a casa final:  jButtonCasaFinal.setIcon(jButtonCasaInicial.getIcon()); 
 		//     - apaga a peca na casa inicial:    jButtonCasaInicial.setIcon(null);
 		// para pinta uma casa de amarelo:        jButton.setBackground(Color.YELLOW);
 		// para mostrar mensagem:                 JOptionPane.showMessageDialog(null, "mensagem de erro");
-	}
+	}*/
 }

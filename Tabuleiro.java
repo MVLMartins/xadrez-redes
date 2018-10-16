@@ -3,6 +3,8 @@
 
 import java.awt.Color;
 import java.awt.Image;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
@@ -12,7 +14,12 @@ import javax.swing.JOptionPane;
 class Tabuleiro {
 
 	private static Tabuleiro instance;
-	
+	public String jogador;
+	public boolean ehSuaVez;
+
+	ObjectOutputStream out ;
+
+
 	private static Casa[][] tabuleiro = new Casa[8][8];
 	private static LinkedList<PecaDeXadrez> pecasBrancas = new LinkedList<>();
 	private static LinkedList<PecaDeXadrez> pecasPretas = new LinkedList<>();
@@ -33,15 +40,27 @@ class Tabuleiro {
 	public final Color peaoPromocao = new Color(232, 63, 111);
 	public final Color reiRoque = new Color(232, 63, 111);
 
-	private Tabuleiro() {
+	private Tabuleiro(ObjectOutputStream out) {
+		this.out = out;
 	}
 
-	public static Tabuleiro getTabuleiro() {
-		if (instance == null)
-			instance = new Tabuleiro();
+	public static Tabuleiro criaTabuleiro(String jogador,ObjectOutputStream out){
+		if(instance==null){
+			instance = new Tabuleiro(out);
+			instance.jogador = jogador;
+			if(jogador.equals("branca")){
+				instance.ehSuaVez = true;
+			}else{
+				instance.ehSuaVez = false;
+			}
+		}
+		return  instance;
+	}
 
+	public static Tabuleiro getTabuleiro(){
 		return instance;
 	}
+
 
 	void criaEPintaAsCasas() {
 		criaAsCasas();
@@ -130,11 +149,16 @@ class Tabuleiro {
 		return tabuleiro[linha][coluna];
 	}
 
-	boolean ehAVezDe(String cor) {
-		if (numDeJogadas % 2 == 0)
-			return cor.equals("branca");
+	public void trocaVez(){
+		ehSuaVez = !ehSuaVez;
+	}
 
-		return cor.equals("preta");
+	public boolean ehSuaVez (){
+		return ehSuaVez;
+	}
+
+	boolean ehSuaPeca(String cor) {
+		return jogador.equals(cor);
 	}
 
 	LinkedList<PecaDeXadrez> getPecasBrancas() {
@@ -252,93 +276,113 @@ class Tabuleiro {
 		obtemBotaoCasa(linha, coluna).setIcon(null);
 	}
 
-	void reverteJogada(int antigaLinha, int antigaColuna, int novaLinha, int novaColuna) {
-		colocaPeca((Peca) pecaClicada, antigaLinha, antigaColuna);
-		removePeca(novaLinha, novaColuna);
-	}
 
-	void trataCliqueSobreUmaCasa(int linha, int coluna) {
-		if (obtemCasa(linha, coluna).getBotao().getBackground() == casaBranca
-				|| obtemCasa(linha, coluna).getBotao().getBackground() == casaPreta) {
-			if (obtemCasa(linha, coluna).getPeca() != null) {
-				if (ehAVezDe(obtemCasa(linha, coluna).getPeca().getCor())) {
-					pintaAsCasas();
-					pecaClicada = (PecaDeXadrez) obtemCasa(linha, coluna).getPeca();
-					linhaClicada = linha;
-					colunaClicada = coluna;
-					corClicada = obtemCasa(linha, coluna).getPeca().getCor();
-					pecaClicada.movimentosValidos();
-				} else {
-					JOptionPane.showMessageDialog(null, "Não é a sua vez.");
+
+	void trataCliqueSobreUmaCasa(int linha, int coluna) throws IOException {
+		System.out.println(ehSuaVez());
+		if(!ehSuaVez()){
+			JOptionPane.showMessageDialog(null, "Não é a sua vez.");
+		}else{
+			if (obtemCasa(linha, coluna).getBotao().getBackground() == casaBranca
+					|| obtemCasa(linha, coluna).getBotao().getBackground() == casaPreta) {
+				if (obtemCasa(linha, coluna).getPeca() != null) {
+					if (ehSuaPeca(obtemCasa(linha, coluna).getPeca().getCor())) {
+						pintaAsCasas();
+						pecaClicada = (PecaDeXadrez) obtemCasa(linha, coluna).getPeca();
+						linhaClicada = linha;
+						colunaClicada = coluna;
+						corClicada = obtemCasa(linha, coluna).getPeca().getCor();
+						pecaClicada.movimentosValidos();
+					} else {
+						JOptionPane.showMessageDialog(null, "Não é a sua peça.");
+					}
 				}
-			}
-		} else {
-			if (obtemBotaoCasa(linha, coluna).getBackground() == movimentoNormal) {
-				movePeca(pecaClicada, linha, coluna);
-			}
+			} else {
 
-			else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoMovDuasCasas) {
-				peaoMoveDuasCasas(pecaClicada, linha, coluna);
-			}
+				if (estaEmCheque(corClicada)) {
+					JOptionPane.showMessageDialog(null, "Essa jogada deixará o Rei em Cheque.");
+				}else{
+					Peca x = (Peca) pecaClicada;
+					Movimento m = new Movimento(linha,coluna,x.getCasa().getLinha(),x.getCasa().getColuna());
+					try{
+						out.writeObject(m);
+					}catch (IOException e){
+						System.out.print("xx");
+						e.printStackTrace();
+					}
 
-			else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoEnPassant) {
-				peaoEnPassant(pecaClicada, linha, coluna);
-			}
-
-			else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoPromocao) {
-				String[] pecas = { "Rainha", "Cavalo", "Torre", "Bispo" };
-				String pecaEscolhida = (String) JOptionPane.showInputDialog(null, (String) "Escolha a peça desejada:",
-						"Promoção", JOptionPane.PLAIN_MESSAGE, null, pecas, pecas[0]);
-				if (((Peca) pecaClicada).getCor().equals("preta")) {
-					if (pecaEscolhida.equals("Rainha"))
-						peaoPromocao(pecaClicada, linha, coluna, new Rainha("preta"),
-								new ImageIcon("src/imagens/pecas/pretas/rainha.png", "").getImage().getScaledInstance(35,
-										50, java.awt.Image.SCALE_SMOOTH));
-					else if (pecaEscolhida.equals("Cavalo"))
-						peaoPromocao(pecaClicada, linha, coluna, new Cavalo("preta"),
-								new ImageIcon("src/imagens/pecas/pretas/cavalo.png", "").getImage().getScaledInstance(40,
-										55, java.awt.Image.SCALE_SMOOTH));
-					else if (pecaEscolhida.equals("Torre"))
-						peaoPromocao(pecaClicada, linha, coluna, new Torre("preta"),
-								new ImageIcon("src/imagens/pecas/pretas/torre.png", "").getImage().getScaledInstance(45, 50,
-										java.awt.Image.SCALE_SMOOTH));
-					else
-						peaoPromocao(pecaClicada, linha, coluna, new Bispo("preta"),
-								new ImageIcon("src/imagens/pecas/pretas/bispo.png", "").getImage().getScaledInstance(40, 58,
-										java.awt.Image.SCALE_SMOOTH));
-					pecasPretas.add((PecaDeXadrez) obtemCasa(linha, coluna).getPeca());
-				} else {
-					if (pecaEscolhida.equals("Rainha"))
-						peaoPromocao(pecaClicada, linha, coluna, new Rainha("branca"),
-								new ImageIcon("src/imagens/pecas/brancas/rainha.png", "").getImage().getScaledInstance(35,
-										50, java.awt.Image.SCALE_SMOOTH));
-					else if (pecaEscolhida.equals("Cavalo"))
-						peaoPromocao(pecaClicada, linha, coluna, new Cavalo("branca"),
-								new ImageIcon("src/imagens/pecas/brancas/cavalo.png", "").getImage().getScaledInstance(40,
-										55, java.awt.Image.SCALE_SMOOTH));
-					else if (pecaEscolhida.equals("Torre"))
-						peaoPromocao(pecaClicada, linha, coluna, new Torre("branca"),
-								new ImageIcon("src/imagens/pecas/brancas/torre.png", "").getImage().getScaledInstance(45,
-										50, java.awt.Image.SCALE_SMOOTH));
-					else
-						peaoPromocao(pecaClicada, linha, coluna, new Bispo("branca"),
-								new ImageIcon("src/imagens/pecas/brancas/bispo.png", "").getImage().getScaledInstance(40,
-										58, java.awt.Image.SCALE_SMOOTH));
-					pecasBrancas.add((PecaDeXadrez) obtemCasa(linha, coluna).getPeca());
 				}
-			}
-			else if (obtemBotaoCasa(linha, coluna).getBackground() == reiRoque) {
-				reiRoque(pecaClicada, linha, coluna);
-			}
-			if (estaEmCheque(corClicada)) {
-				reverteJogada(linhaClicada, colunaClicada, linha, coluna);
-				JOptionPane.showMessageDialog(null, "Essa jogada deixará o Rei em Cheque.");
-			}
-			
-			else
-				numDeJogadas++;
 
-			pintaAsCasas();
+
+			}
 		}
+
+
 	}
+
+	public void  movePecas(int linha, int coluna,int linhaAntiga, int colunaAntiga ){
+
+		PecaDeXadrez pecaClicada = (PecaDeXadrez) obtemCasa(linhaAntiga,colunaAntiga).getPeca();
+		if (obtemBotaoCasa(linha, coluna).getBackground() == movimentoNormal) {
+			movePeca(pecaClicada, linha, coluna);
+		}
+
+		else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoMovDuasCasas) {
+			peaoMoveDuasCasas(pecaClicada, linha, coluna);
+		}
+
+		else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoEnPassant) {
+			peaoEnPassant(pecaClicada, linha, coluna);
+		}
+
+		else if (obtemBotaoCasa(linha, coluna).getBackground() == peaoPromocao) {
+			String[] pecas = { "Rainha", "Cavalo", "Torre", "Bispo" };
+			String pecaEscolhida = (String) JOptionPane.showInputDialog(null, "Escolha a peça desejada:",
+					"Promoção", JOptionPane.PLAIN_MESSAGE, null, pecas, pecas[0]);
+			if (((Peca) pecaClicada).getCor().equals("preta")) {
+				if (pecaEscolhida.equals("Rainha"))
+					peaoPromocao(pecaClicada, linha, coluna, new Rainha("preta"),
+							new ImageIcon("src/imagens/pecas/pretas/rainha.png", "").getImage().getScaledInstance(35,
+									50, java.awt.Image.SCALE_SMOOTH));
+				else if (pecaEscolhida.equals("Cavalo"))
+					peaoPromocao(pecaClicada, linha, coluna, new Cavalo("preta"),
+							new ImageIcon("src/imagens/pecas/pretas/cavalo.png", "").getImage().getScaledInstance(40,
+									55, java.awt.Image.SCALE_SMOOTH));
+				else if (pecaEscolhida.equals("Torre"))
+					peaoPromocao(pecaClicada, linha, coluna, new Torre("preta"),
+							new ImageIcon("src/imagens/pecas/pretas/torre.png", "").getImage().getScaledInstance(45, 50,
+									java.awt.Image.SCALE_SMOOTH));
+				else
+					peaoPromocao(pecaClicada, linha, coluna, new Bispo("preta"),
+							new ImageIcon("src/imagens/pecas/pretas/bispo.png", "").getImage().getScaledInstance(40, 58,
+									java.awt.Image.SCALE_SMOOTH));
+				pecasPretas.add((PecaDeXadrez) obtemCasa(linha, coluna).getPeca());
+			} else {
+				if (pecaEscolhida.equals("Rainha"))
+					peaoPromocao(pecaClicada, linha, coluna, new Rainha("branca"),
+							new ImageIcon("src/imagens/pecas/brancas/rainha.png", "").getImage().getScaledInstance(35,
+									50, java.awt.Image.SCALE_SMOOTH));
+				else if (pecaEscolhida.equals("Cavalo"))
+					peaoPromocao(pecaClicada, linha, coluna, new Cavalo("branca"),
+							new ImageIcon("src/imagens/pecas/brancas/cavalo.png", "").getImage().getScaledInstance(40,
+									55, java.awt.Image.SCALE_SMOOTH));
+				else if (pecaEscolhida.equals("Torre"))
+					peaoPromocao(pecaClicada, linha, coluna, new Torre("branca"),
+							new ImageIcon("src/imagens/pecas/brancas/torre.png", "").getImage().getScaledInstance(45,
+									50, java.awt.Image.SCALE_SMOOTH));
+				else
+					peaoPromocao(pecaClicada, linha, coluna, new Bispo("branca"),
+							new ImageIcon("src/imagens/pecas/brancas/bispo.png", "").getImage().getScaledInstance(40,
+									58, java.awt.Image.SCALE_SMOOTH));
+				pecasBrancas.add((PecaDeXadrez) obtemCasa(linha, coluna).getPeca());
+			}
+		}
+		else if (obtemBotaoCasa(linha, coluna).getBackground() == reiRoque) {
+				reiRoque(pecaClicada, linha, coluna);
+		}
+
+		pintaAsCasas();
+
+	}
+
 }
