@@ -98,7 +98,7 @@ class ClientHandler implements Runnable {
             try {
                 //Movimento obj = new Movimento(2,2,2,2);
                 Movimento obj = (Movimento) in.readObject();
-                System.out.println("olhaaaaa\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 server.broadcastMessages(obj);
             } catch (IOException e) {
                 System.out.println("1");

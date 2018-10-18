@@ -277,10 +277,11 @@ class Tabuleiro {
 	}
 
 
+	
 
 	void trataCliqueSobreUmaCasa(int linha, int coluna) throws IOException {
-		if(!ehSuaVez()){
-			JOptionPane.showMessageDialog(null, "NÃ£o Ã© a sua vez.");
+		if(!ehSuaVez()) {
+			JOptionPane.showMessageDialog(null, "Não é a sua vez.");
 		}else{
 			if (obtemCasa(linha, coluna).getBotao().getBackground() == casaBranca
 					|| obtemCasa(linha, coluna).getBotao().getBackground() == casaPreta) {
@@ -293,7 +294,7 @@ class Tabuleiro {
 						corClicada = obtemCasa(linha, coluna).getPeca().getCor();
 						pecaClicada.movimentosValidos();
 					} else {
-						JOptionPane.showMessageDialog(null, "NÃ£o Ã© a sua peÃ§a.");
+						JOptionPane.showMessageDialog(null, "Não é a sua peça.");
 					}
 				}
 			} else {
@@ -305,6 +306,10 @@ class Tabuleiro {
 					try{
 						out.cliente.enviaMovimento(linha,coluna,x.getCasa().getLinha(),x.getCasa().getColuna(),
                                 obtemCasa(linha, coluna).getBotao().getBackground());
+						
+						//
+						
+						
 					}catch (IOException e){
 						System.out.print("xx");
 						e.printStackTrace();

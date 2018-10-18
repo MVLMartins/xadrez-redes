@@ -14,6 +14,7 @@ public class Client {
     ObjectOutputStream out;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        //new Client("192.168.0.4", 12345).run();
         new Client("localhost", 12345).run();
     }
 
@@ -79,6 +80,10 @@ public class Client {
         Movimento a = new Movimento(linha, coluna, linhaAntiga, colunaAntiga);
         a.corCasa = cor;
         out.writeObject(a);
+    }
+    
+    public void enviaTempo() {
+    	
     }
 
     public void recebiMovimento(){

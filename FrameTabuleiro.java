@@ -54,6 +54,15 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 		super.setResizable(false);
 		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.montaTabuleiro(jogador);
+		
+		Cronometro c1 = new Cronometro(5);
+		Cronometro c2 = new Cronometro(6);
+		
+		c1.init("Jogador 1", 1);
+		c2.init("Jogador 2", 2);
+		c1.iniciarCronometro();
+	
+		
 		super.pack();
 		super.setVisible(true);
 
