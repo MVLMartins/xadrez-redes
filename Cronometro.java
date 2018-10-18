@@ -14,6 +14,12 @@ public class Cronometro {
 	private JLabel contagemTempo;
 	private Timer tm;
 	public int contador;
+
+	private boolean ativo = false;
+
+	public boolean estaAtivo(){
+		return ativo;
+	}
 	
 	
 	public Cronometro(int contador) {
@@ -63,6 +69,7 @@ public class Cronometro {
 	
 	 
 	public void iniciarCronometro() {
+		ativo = true;
 		tm = new Timer();
 		tm.scheduleAtFixedRate(new TimerTask(){
 			@Override
@@ -79,6 +86,7 @@ public class Cronometro {
 	
 	public void pararCronometro() {
 		tm.cancel();
+		ativo = false;
 	}
 	
 }

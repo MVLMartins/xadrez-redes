@@ -47,6 +47,8 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 	private static final String TEXTO_BARRA_SUPERIOR = "Xadrez - EP redes";
 	public Tabuleiro tabuleiro ;
 	public Client cliente;
+    Cronometro c1 = new Cronometro(5);
+    Cronometro c2 = new Cronometro(6);
 	
 	FrameTabuleiro(String jogador, Client client) {
 		this.cliente = client;
@@ -55,8 +57,7 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.montaTabuleiro(jogador);
 		
-		Cronometro c1 = new Cronometro(5);
-		Cronometro c2 = new Cronometro(6);
+
 		
 		c1.init("Jogador 1", 1);
 		c2.init("Jogador 2", 2);
@@ -68,7 +69,27 @@ class FrameTabuleiro extends JFrame implements ActionListener {
 
 	}
 
-	@Override
+    public void iniciCronometro1(){
+        c1.iniciarCronometro();
+    }
+
+    public void iniciCronometro2(){
+        c2.iniciarCronometro();
+    }
+
+    public void trocaCronometro(){
+        if(c1.estaAtivo()){
+            c1.pararCronometro();
+            c2.iniciarCronometro();
+        }else{
+            c2.pararCronometro();
+            c1.iniciarCronometro();
+        }
+    }
+
+
+
+    @Override
 	public void actionPerformed(ActionEvent e) {
 		String[] coordenada = e.getActionCommand().split(",");
 		int linha = Integer.parseInt(coordenada[0]);

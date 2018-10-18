@@ -81,14 +81,7 @@ public class Client {
         a.corCasa = cor;
         out.writeObject(a);
     }
-    
-    public void enviaTempo() {
-    	
-    }
 
-    public void recebiMovimento(){
-
-    }
 
 }
 
@@ -115,7 +108,7 @@ class ReceivedMessagesHandler implements Runnable {
                 Movimento response = (Movimento) in.readObject();
                 System.out.println(response.coluna);
                 client.frame.tabuleiro.movePecas(response.linha,response.coluna,response.linhaAntiga,response.colunaAntiga,response.corCasa);
-
+                client.frame.trocaCronometro();
             } catch (IOException e) {
             } catch (ClassNotFoundException e) {
                // e.printStackTrace();
